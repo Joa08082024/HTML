@@ -1,0 +1,276 @@
+<!DOCTYPE html> 
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Freteiros</title>
+    <style>
+        /* Seu estilo existente permanece inalterado */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 90%;
+            max-width: 600px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            margin: 5px 0;
+            width: calc(100% - 22px);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .total {
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .print-button, .export-button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .print-button:hover, .export-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tabela de Freteiros</h1>
+
+    <!-- Formulário de Entrada -->
+    <form id="freteiroForm">
+        <label for="codMotorista">Código do Motorista:</label>
+        <input type="number" id="codMotorista" name="codMotorista" required>
+
+        <label for="codMotivo">Código do Motivo:</label>
+        <input type="number" id="codMotivo" name="codMotivo" required>
+
+        <label for="numeroNota">Número da Nota:</label>
+        <input type="text" id="numeroNota" name="numeroNota" required>
+
+        <label for="valor">Valor:</label>
+        <input type="number" step="0.01" id="valor" name="valor" required>
+
+        <input type="submit" value="Adicionar">
+    </form>
+
+    <!-- Formulário de Cadastro de Freteiros -->
+    <h2>Cadastrar Novo Freteiro</h2>
+    <form id="novoFreteiroForm">
+        <label for="codigoFreteiro">Código do Freteiro:</label>
+        <input type="number" id="codigoFreteiro" name="codigoFreteiro" required>
+
+        <label for="nomeFreteiro">Nome do Freteiro:</label>
+        <input type="text" id="nomeFreteiro" name="nomeFreteiro" required>
+
+        <input type="submit" value="Cadastrar Freteiro">
+    </form>
+
+    <button class="print-button" onclick="window.print()">Imprimir Tabela</button> <!-- Botão de imprimir -->
+    <button class="export-button" onclick="exportToExcel()">Exportar para Excel</button> <!-- Botão de exportar Excel -->
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <!-- Tabela de Freteiros -->
+    <table id="tabelaFreteiros">
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Código</th>
+                <th>Freteiro</th>
+                <th>Motivo</th>
+                <th>Nota</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <!-- Exibir Total -->
+    <p class="total">Total: <span id="total">0.00</span></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script> <!-- Adiciona a biblioteca SheetJS -->
+
+    <script>
+        // Dados fictícios dos freteiros e motivos
+        const freteiros = {
+            27: "ACLEILSON - ANTONIO A.OLIVEIRA SILVA",
+            212: "SEBASTIÃO",
+            275: "ADELIO - VINICIUS MARTINS LISBOA LIMA",
+            12: "ADELSON - ADELSON DE P. MORAIS",
+            255:"ALMEIDA - ",
+            16: "AGNALDO - AGNALDO RIBEIRO",
+            22: "ANDERSON - ANDERSON ARRUDA",
+            19: "BARBOSA",
+            302: "BADU",
+            237: "BISPO - RAFAEL BISPO DE ARAGAO",
+            36: "BRENO - BRENO DOS SANTOS BRITO",
+            258: "BRITO - BRUNO DOS SANTOS BRITO",
+            83: "BRUNO - BRUNO FERNANDO DE CAMARGO",
+            236: "BUENO - ODIRLEY BUENO DE CAMARGO",
+            33: "CAETANO - ROMILSON VILA NOVA CAETANO",
+            20: "CAIQUE - CAIQUE LIMA PEDERIVA",
+            79: "CAMPOS - OSMAR DOS SANTOS CAMPOS",
+            34: "CHRISTIAN - CHRISTIAN DE J. AGUSTINHO",
+            28: "CLAUDIO - ANTONIO C. R. PEDERIVA",
+            233: "CLEONICE - CLEONICE PEREIRA VILAS BOAS VALADAO",
+            277: "COSTA - FABIO DA COSTA SILVA",
+            65: "CUNHA - ",
+            39: "DAVI - ",
+            289: "DIAS - RAFAEL CRISTILIANO DIAS",
+            40: "DILERMANO - DILERMANO T. DE MIRANDA",
+            465: "DIOGO",
+            269: "DOUGLAS - DOUGLAS CHRISTIAN MOREIRA",
+            61: "EDER - EDER VITURINO DE SOUSA",
+            270: "EDUARDO - EDUARDO BESERRA DOS SANTOS",
+            215: "ELOI - JHON ELOI GUIMARAES",
+            45: "ERIK - RENAN PEDRO PEREIRA TORRES DA SILVA",
+            256: "FABIO - FABIO EVANGELISTA DOS SANTOS",
+            259: "FARIAS - JOSE GLERISTON FARIAS MACEDO",
+            91: "FELIPE - FELIPE RODRIGUES DE SANTANA",
+            101: "FERNANDA",
+            88: "FERNANDO - FERNANDO C. BRITO",
+            287: "FLORISVALDO - FLORISVALDO GOMES RIBEIRO",
+            226: "IZAQUIEL",
+            58: "FRANCISCO - FRANCISCO VAGNER DE OLIVEIRA SILVA",
+            98: "GASPAR - DOUGLAS WELLINGTON DA SILVA",
+            50: "GILBERTO - GILBERTO C.LOPES",
+            48: "GILMAR - GILMAR NARVAIS",
+            52: "GUSTAVO - GUSTAVO LOPES SOARES",
+            261: "HENRIQUE - PAULO HENRIQUES DIAS",
+            274: "IGO - RODRIGO RODRIGUES",
+            249: "IZAIAS - IZAIAS RODRIGUES DAS NEVES",
+            171: "JOAO - JOAO BATISTA DA SILVA",
+            86: "J DA SILVA - ADMILSON JOSE DA SILVA",
+            279: "JAMES - JAMES TEIXEIRA BARROSO",
+            231: "JONAS - JONAS DE OLIVEIRA",
+            238: "KLEBER - KLEBER ANTONIO GOMES",
+            239: "LAERCIO - LAERCIO DOS SANTOS VIANA",
+            61: "LUIZ - LUIZ HENRIQUE DA CUNHA",
+            93: "SOUZA - ",
+            68: "OLIVEIRA - ANA MARCIA NERES BATISTA",
+            280: "PAULO - PAULO DA SILVA CARVALHO",
+            28: "WASHINGTON - ",
+            51: "SANTOS -",
+            30: "SILVA - SAMIR ALVES DA SILVA",
+            244: "JOEL",
+            218: "JOSE - JOSE MOURA DA SILVA",
+            35: "JOSUE - JOSUE DA SILVA BRITO"
+        };
+
+        const motivos = {
+            1: "Entrega",
+            2: "Recolhimento",
+            3: "Troca",
+            4: "Devolução"
+        };
+
+        let total = 0; // Total inicial
+
+        // Lidar com a submissão do formulário de freteiros
+        document.getElementById("freteiroForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const codMotorista = parseInt(document.getElementById("codMotorista").value);
+            const codMotivo = parseInt(document.getElementById("codMotivo").value);
+            const numeroNota = document.getElementById("numeroNota").value;
+            const valor = parseFloat(document.getElementById("valor").value);
+
+            // Validar entrada
+            if (isNaN(codMotorista) || isNaN(codMotivo) || isNaN(valor) || !numeroNota.trim()) {
+                alert("Por favor, preencha todos os campos corretamente.");
+                return;
+            }
+
+            const freteiroNome = freteiros[codMotorista] || "Desconhecido";
+            const motivoNome = motivos[codMotivo] || "Desconhecido";
+
+            const tabela = document.getElementById("tabelaFreteiros").getElementsByTagName("tbody")[0];
+            const novaLinha = tabela.insertRow();
+
+            novaLinha.insertCell(0).textContent = tabela.rows.length; // Número da linha
+            novaLinha.insertCell(1).textContent = codMotorista;
+            novaLinha.insertCell(2).textContent = freteiroNome;
+            novaLinha.insertCell(3).textContent = motivoNome;
+            novaLinha.insertCell(4).textContent = numeroNota;
+            novaLinha.insertCell(5).textContent = valor.toFixed(2);
+
+            total += valor; // Atualizar o total
+            document.getElementById("total").textContent = total.toFixed(2); // Exibir o total atualizado
+
+            // Limpar formulário
+            document.getElementById("freteiroForm").reset();
+        });
+
+        // Função de exportação para Excel com total incluído
+        function exportToExcel() {
+            const table = document.getElementById("tabelaFreteiros");
+            const workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+            // Cria uma nova linha para adicionar o total
+            const worksheet = workbook.Sheets["Sheet1"];
+            const totalRow = [["", "", "", "", "Total", total.toFixed(2)]];
+            
+            // Define a posição para inserir o total após a última linha da tabela
+            XLSX.utils.sheet_add_aoa(worksheet, totalRow, { origin: -1 });
+
+            // Exporta o arquivo Excel
+            XLSX.writeFile(workbook, "tabela_freteiros_com_total.xlsx");
+        }
+    </script>
+</body>
+</html>
