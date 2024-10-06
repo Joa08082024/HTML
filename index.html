@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Cadastro e Tabela de Freteiros</title>
+    <title>Formulário de Cadastro</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        input[type="text"], input[type="number"], input[type="submit"] {
+        input[type="text"], input[type="submit"] {
             padding: 8px;
             margin: 5px 0;
             width: 100%;
@@ -23,31 +23,12 @@
         input[type="submit"]:hover {
             background-color: #45a049;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .total {
-            font-weight: bold;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
 
     <h1>Cadastro de Freteiros</h1>
-    <form action="https://docs.google.com/spreadsheets/d/1gPbnl6jfRG0vuaGW4jeJ50qcxU_FhXf6U6r7cKabucY/edit?usp=sharing" method="post"> 
+    <form action="https://script.google.com/macros/s/AKfycbzGblqIKITV-wFO_ZHmovS_SePSgFg7858Cvev6yWK-5fEQGvdZ4c7z0978uMfmwMNP5A/exec" method="post"> 
         <label for="nome">Nome:</label><br>
         <input type="text" id="nome" name="nome" required><br><br>
 
@@ -56,113 +37,6 @@
 
         <input type="submit" value="Enviar">
     </form>
-
-    <h2>Adicionar Freteiro e Tabela de Registro</h2>
-    <form id="freteiroForm">
-        <label for="codMotorista">Código do Motorista:</label>
-        <input type="number" id="codMotorista" name="codMotorista" required>
-
-        <label for="codMotivo">Código do Motivo:</label>
-        <input type="number" id="codMotivo" name="codMotivo" required>
-
-        <label for="numeroNota">Número da Nota:</label>
-        <input type="text" id="numeroNota" name="numeroNota" required>
-
-        <label for="valor">Valor:</label>
-        <input type="number" step="0.01" id="valor" name="valor" required>
-
-        <input type="submit" value="Adicionar">
-    </form>
-
-    <h2>Cadastrar Novo Freteiro</h2>
-    <form id="novoFreteiroForm">
-        <label for="codigoFreteiro">Código do Freteiro:</label>
-        <input type="number" id="codigoFreteiro" name="codigoFreteiro" required>
-
-        <label for="nomeFreteiro">Nome do Freteiro:</label>
-        <input type="text" id="nomeFreteiro" name="nomeFreteiro" required>
-
-        <input type="submit" value="Cadastrar Freteiro">
-    </form>
-
-    <button class="print-button" onclick="window.print()">Imprimir Tabela</button>
-    <table id="tabelaFreteiros">
-        <thead>
-            <tr>
-                <th>N°</th>
-                <th>Código</th>
-                <th>Freteiro</th>
-                <th>Motivo</th>
-                <th>Nota</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dados serão inseridos aqui -->
-        </tbody>
-    </table>
-
-    <p class="total">Total: <span id="total">0.00</span></p>
-
-    <script>
-        const freteiros = {
-            27: "ACLEILSON - ANTONIO A.OLIVEIRA SILVA",
-            212: "SEBASTIÃO",
-            // Adicione outros freteiros conforme necessário
-        };
-
-        const motivos = {
-            1: "CHAPA/REEMBOLSO",
-            2: "DESCONTAR",
-            // Adicione outros motivos conforme necessário
-        };
-
-        let total = 0;
-        let contador = 1;
-
-        document.getElementById('freteiroForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const codMotorista = document.getElementById('codMotorista').value;
-            const codMotivo = document.getElementById('codMotivo').value;
-            const numeroNota = document.getElementById('numeroNota').value;
-            const valor = parseFloat(document.getElementById('valor').value).toFixed(2);
-
-            if (freteiros[codMotorista] && motivos[codMotivo]) {
-                const tabela = document.getElementById('tabelaFreteiros').querySelector('tbody');
-                const novaLinha = document.createElement('tr');
-
-                novaLinha.innerHTML = `
-                    <td>${contador}</td>
-                    <td>${codMotorista}</td>
-                    <td>${freteiros[codMotorista]}</td>
-                    <td>${codMotivo}</td>
-                    <td>${numeroNota}</td>
-                    <td>${valor}</td>
-                `;
-
-                tabela.appendChild(novaLinha);
-                total = (parseFloat(total) + parseFloat(valor)).toFixed(2);
-                document.getElementById('total').textContent = total;
-                contador++;
-            } else {
-                alert('Código de Motorista ou Motivo inválido!');
-            }
-
-            document.getElementById('freteiroForm').reset();
-        });
-
-        document.getElementById('novoFreteiroForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const codigoFreteiro = document.getElementById('codigoFreteiro').value;
-            const nomeFreteiro = document.getElementById('nomeFreteiro').value;
-
-            freteiros[codigoFreteiro] = nomeFreteiro;
-            alert(`Freteiro ${nomeFreteiro} cadastrado com sucesso!`);
-            document.getElementById('novoFreteiroForm').reset();
-        });
-    </script>
 
 </body>
 </html>
